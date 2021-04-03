@@ -1,24 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import {ThemeProvider} from '@material-ui/styles';
+
+import Footer from './presentation/components/footer/footer';
+import Header from './presentation/components/header/header';
+import Home from './presentation/pages/Home/Home';
+import TeamManagement from './presentation/pages/TeamManagement/TeamManagement';
+
+import {theme} from './presentation/styles/theme';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <Header />
+        <Switch>
+          <Route path="/" exact component={Home} />
+          <Route path="/team-management" component={TeamManagement} />
+        </Switch>
+        <Footer />
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 
