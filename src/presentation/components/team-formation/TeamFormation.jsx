@@ -13,7 +13,7 @@ const TeamFormation = ({formation, players, removePlayer, ...props}) => {
     <section className={classes.teamConfig}>
       {players.map(player => (
         <PlayerCard
-          key={player.name}
+          key={player.player_id}
           player={player}
           removePlayer={removePlayer}
           isSelected

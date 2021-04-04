@@ -16,14 +16,14 @@ const PlayerCard = ({
       <section className={classes.infoContainer}>
         <div className={classes.nameRow}>
           <p>
-            <strong>Name:</strong> {player.name}
+            <strong>Name:</strong> {player.display_name}
           </p>
           <p>
-            <strong>Age:</strong> {player.age}
+            <strong>Birthdate:</strong> {player.birthdate}
           </p>
         </div>
         <p>
-          <strong>Nacionality:</strong> {player.nacionality}
+          <strong>Nacionality:</strong> {player.nationality}
         </p>
       </section>
       <section className={classes.actionsContainer}>

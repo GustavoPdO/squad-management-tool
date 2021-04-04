@@ -25,20 +25,21 @@ import {
   updateTeam,
 } from '../../../redux/actions/teams';
 import TeamFormation from '../../components/team-formation/TeamFormation';
+import {getPlayers, resetPlayers} from '../../../redux/actions/players';
 
-const availablePlayers = [
-  {name: 'Cristiano Ronaldo', age: '32', nacionality: 'Portugal'},
-  {name: 'Ronaldo Luiz de Alves', age: '28', nacionality: 'Brazil'},
-  {name: 'Ronaldo da Silva de Souza', age: '18', nacionality: 'Brazil'},
-  {name: 'Gustavo da Silva de Souza', age: '18', nacionality: 'Brazil'},
-  {name: 'Guilherme da Silva de Souza', age: '18', nacionality: 'Brazil'},
-  {name: 'Gugu da Silva de Souza', age: '18', nacionality: 'Brazil'},
-  {name: 'Augusto da Silva de Souza', age: '18', nacionality: 'Brazil'},
-  {name: 'Gilberto da Silva de Souza', age: '18', nacionality: 'Brazil'},
-  {name: 'Rafael da Silva de Souza', age: '18', nacionality: 'Brazil'},
-  {name: 'Antonio da Silva de Souza', age: '18', nacionality: 'Brazil'},
-  {name: 'Alcides da Silva de Souza', age: '18', nacionality: 'Brazil'},
-];
+// const availablePlayers = [
+//   {name: 'Cristiano Ronaldo', age: '32', nacionality: 'Portugal'},
+//   {name: 'Ronaldo Luiz de Alves', age: '28', nacionality: 'Brazil'},
+//   {name: 'Ronaldo da Silva de Souza', age: '18', nacionality: 'Brazil'},
+//   {name: 'Gustavo da Silva de Souza', age: '18', nacionality: 'Brazil'},
+//   {name: 'Guilherme da Silva de Souza', age: '18', nacionality: 'Brazil'},
+//   {name: 'Gugu da Silva de Souza', age: '18', nacionality: 'Brazil'},
+//   {name: 'Augusto da Silva de Souza', age: '18', nacionality: 'Brazil'},
+//   {name: 'Gilberto da Silva de Souza', age: '18', nacionality: 'Brazil'},
+//   {name: 'Rafael da Silva de Souza', age: '18', nacionality: 'Brazil'},
+//   {name: 'Antonio da Silva de Souza', age: '18', nacionality: 'Brazil'},
+//   {name: 'Alcides da Silva de Souza', age: '18', nacionality: 'Brazil'},
+// ];
 
 const TeamManagement = () => {
   const classes = useStyles();
@@ -48,6 +49,11 @@ const TeamManagement = () => {
   const history = useHistory();
   //When there's an active team on state the application gets it and fill the component state
   const editingTeam = useSelector(state => state.teams.activeTeam);
+
+  const availablePlayers = useSelector(state => state.players.available);
+
+  let searchTimer;
+  const [playerSearch, setPlayerSearch] = useState('');
 
   const [name, setName] = useState(editingTeam ? editingTeam.name : '');
   const [description, setDescription] = useState(
@@ -64,7 +70,9 @@ const TeamManagement = () => {
   const [formation, setFormation] = useState(
     editingTeam ? editingTeam.formation : '3-4-3',
   );
-  const [selectedPlayers, setSelectedPlayers] = useState([]);
+  const [selectedPlayers, setSelectedPlayers] = useState(
+    editingTeam ? editingTeam.selectedPlayers : [],
+  );
   const [showError, setShowError] = useState(false);
 
   function validateWebSite() {
@@ -74,6 +82,23 @@ const TeamManagement = () => {
   function validateName() {
     return name === '';
   }
+
+  function onPlayerSearch(event) {
+    setPlayerSearch(event.target.value);
+
+    //searchTimer = setTimeout(() => getPlayers(playerSearch), 3000);
+  }
+
+  useEffect(() => {
+    if (playerSearch !== '') {
+      clearTimeout(searchTimer);
+      // The lint warning is being disabled because in this case we want that searchTimer loses
+      // its referencers between renders and use only the last one
+      // eslint-disable-next-line
+      searchTimer = setTimeout(() => dispatch(getPlayers(playerSearch)), 3000);
+    }
+    return () => clearTimeout(searchTimer);
+  }, [playerSearch]);
 
   function onChangeTag(value) {
     if (value[value.length - 1] === ';') return;
@@ -99,14 +124,18 @@ const TeamManagement = () => {
     setFormation(event.target.value);
   }
 
-  function onAddPlayer(player) {
-    const isPlayerAlreadyselected = selectedPlayers.some(
-      item => item.name === player.name,
-    );
-    const teamSize = formation
+  function getTeamSize() {
+    return formation
       .split('-')
       .map(number => +number)
       .reduce((total, item) => total + item);
+  }
+
+  function onAddPlayer(player) {
+    const isPlayerAlreadyselected = selectedPlayers.some(
+      item => item.player_id === player.player_id,
+    );
+    const teamSize = getTeamSize();
     if (isPlayerAlreadyselected || selectedPlayers.length >= teamSize) {
       return;
     }
@@ -116,14 +145,19 @@ const TeamManagement = () => {
 
   function onRemovePlayer(player) {
     setSelectedPlayers(
-      selectedPlayers.filter(item => item.name !== player.name),
+      selectedPlayers.filter(item => item.player_id !== player.player_id),
     );
   }
 
   function onSaveTeam() {
     //after clicking save button the form error will trigger if necessary
     setShowError(true);
-    if (validateName() || validateWebSite()) return;
+    if (
+      validateName() ||
+      validateWebSite() ||
+      selectedPlayers.length < getTeamSize()
+    )
+      return;
 
     const team = {
       name,
@@ -132,6 +166,7 @@ const TeamManagement = () => {
       website,
       type,
       formation,
+      selectedPlayers,
     };
 
     if (editingTeam) {
@@ -145,7 +180,10 @@ const TeamManagement = () => {
 
   useEffect(() => {
     //When this component is unmounted the active team will be resetted
-    return () => dispatch(resetActiveTeam());
+    return () => {
+      dispatch(resetActiveTeam());
+      dispatch(resetPlayers());
+    };
   }, [dispatch]);
 
   return (
@@ -235,24 +273,31 @@ const TeamManagement = () => {
             <section className={classes.inputSection}>
               <div className={classes.inputSubDivision}>
                 <div className={classes.formationSelectionContainer}>
-                  <p>Formation *</p>
-                  <Select
-                    className={classes.select}
-                    value={formation}
-                    onChange={onChangeFormation}
-                    input={<TextInput />}
+                  <FormControl
+                    required
+                    error={showError && selectedPlayers.length < getTeamSize()}
                   >
-                    <MenuItem value={'3-2-2-3'}>3-2-2-3</MenuItem>
-                    <MenuItem value={'3-2-3-1'}>3-2-3-1</MenuItem>
-                    <MenuItem value={'3-4-3'}>3-4-3</MenuItem>
-                    <MenuItem value={'3-5-2'}>3-5-2</MenuItem>
-                    <MenuItem value={'4-2-3-1'}>4-2-3-1</MenuItem>
-                    <MenuItem value={'4-3-1-1'}>4-3-1-1</MenuItem>
-                    <MenuItem value={'4-3-2'}>4-3-2</MenuItem>
-                    <MenuItem value={'4-4-2'}>4-4-2</MenuItem>
-                    <MenuItem value={'4-5-1'}>4-5-1</MenuItem>
-                    <MenuItem value={'5-4-1'}>5-4-1</MenuItem>
-                  </Select>
+                    <FormLabel htmlFor="team-website-input">
+                      Formation
+                    </FormLabel>
+                    <Select
+                      className={classes.select}
+                      value={formation}
+                      onChange={onChangeFormation}
+                      input={<TextInput />}
+                    >
+                      <MenuItem value={'3-2-2-3'}>3-2-2-3</MenuItem>
+                      <MenuItem value={'3-2-3-1'}>3-2-3-1</MenuItem>
+                      <MenuItem value={'3-4-3'}>3-4-3</MenuItem>
+                      <MenuItem value={'3-5-2'}>3-5-2</MenuItem>
+                      <MenuItem value={'4-2-3-1'}>4-2-3-1</MenuItem>
+                      <MenuItem value={'4-3-1-1'}>4-3-1-1</MenuItem>
+                      <MenuItem value={'4-3-2'}>4-3-2</MenuItem>
+                      <MenuItem value={'4-4-2'}>4-4-2</MenuItem>
+                      <MenuItem value={'4-5-1'}>4-5-1</MenuItem>
+                      <MenuItem value={'5-4-1'}>5-4-1</MenuItem>
+                    </Select>
+                  </FormControl>
                 </div>
                 <TeamFormation
                   formation={formation}
@@ -268,21 +313,32 @@ const TeamManagement = () => {
                   <FormLabel htmlFor="player-search-input">
                     Search Players
                   </FormLabel>
-                  <TextInput id="player-search-input" />
+                  <TextInput
+                    id="player-search-input"
+                    value={playerSearch}
+                    onChange={onPlayerSearch}
+                  />
                 </FormControl>
                 <section className={classes.playerList}>
-                  {availablePlayers.map(player => (
-                    <PlayerCard
-                      key={player.name}
-                      player={player}
-                      selectPlayer={onAddPlayer}
-                      disabled={
-                        selectedPlayers.findIndex(
-                          selected => selected.name === player.name,
-                        ) !== -1
-                      }
-                    />
-                  ))}
+                  {availablePlayers.length > 0 ? (
+                    availablePlayers.map(player => (
+                      <PlayerCard
+                        key={player.player_id}
+                        player={player}
+                        selectPlayer={onAddPlayer}
+                        disabled={
+                          selectedPlayers.findIndex(
+                            selected => selected.player_id === player.player_id,
+                          ) !== -1
+                        }
+                      />
+                    ))
+                  ) : (
+                    <p>
+                      Sem jogadores com esse nome. Tente outro nome e aguarde
+                      por favor
+                    </p>
+                  )}
                 </section>
               </div>
             </section>
