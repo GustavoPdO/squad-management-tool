@@ -63,11 +63,7 @@ export const useStyles = makeStyles(theme => ({
   select: {
     width: '150px',
   },
-  teamConfig: {
-    background: theme.palette.gradient.vertical,
-    height: '600px',
-    marginBottom: '16px',
-  },
+
   playerList: {
     maxHeight: '576px',
     overflowY: 'scroll',

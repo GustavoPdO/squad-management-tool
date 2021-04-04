@@ -24,6 +24,21 @@ import {
   resetActiveTeam,
   updateTeam,
 } from '../../../redux/actions/teams';
+import TeamFormation from '../../components/team-formation/TeamFormation';
+
+const availablePlayers = [
+  {name: 'Cristiano Ronaldo', age: '32', nacionality: 'Portugal'},
+  {name: 'Ronaldo Luiz de Alves', age: '28', nacionality: 'Brazil'},
+  {name: 'Ronaldo da Silva de Souza', age: '18', nacionality: 'Brazil'},
+  {name: 'Gustavo da Silva de Souza', age: '18', nacionality: 'Brazil'},
+  {name: 'Guilherme da Silva de Souza', age: '18', nacionality: 'Brazil'},
+  {name: 'Gugu da Silva de Souza', age: '18', nacionality: 'Brazil'},
+  {name: 'Augusto da Silva de Souza', age: '18', nacionality: 'Brazil'},
+  {name: 'Gilberto da Silva de Souza', age: '18', nacionality: 'Brazil'},
+  {name: 'Rafael da Silva de Souza', age: '18', nacionality: 'Brazil'},
+  {name: 'Antonio da Silva de Souza', age: '18', nacionality: 'Brazil'},
+  {name: 'Alcides da Silva de Souza', age: '18', nacionality: 'Brazil'},
+];
 
 const TeamManagement = () => {
   const classes = useStyles();
@@ -49,6 +64,7 @@ const TeamManagement = () => {
   const [formation, setFormation] = useState(
     editingTeam ? editingTeam.formation : '3-4-3',
   );
+  const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [showError, setShowError] = useState(false);
 
   function validateWebSite() {
@@ -76,6 +92,32 @@ const TeamManagement = () => {
 
   function removeTag(value) {
     setTagArray(tagArray.filter(item => item !== value));
+  }
+
+  function onChangeFormation(event) {
+    setSelectedPlayers([]);
+    setFormation(event.target.value);
+  }
+
+  function onAddPlayer(player) {
+    const isPlayerAlreadyselected = selectedPlayers.some(
+      item => item.name === player.name,
+    );
+    const teamSize = formation
+      .split('-')
+      .map(number => +number)
+      .reduce((total, item) => total + item);
+    if (isPlayerAlreadyselected || selectedPlayers.length >= teamSize) {
+      return;
+    }
+
+    setSelectedPlayers([...selectedPlayers, player]);
+  }
+
+  function onRemovePlayer(player) {
+    setSelectedPlayers(
+      selectedPlayers.filter(item => item.name !== player.name),
+    );
   }
 
   function onSaveTeam() {
@@ -197,7 +239,7 @@ const TeamManagement = () => {
                   <Select
                     className={classes.select}
                     value={formation}
-                    onChange={e => setFormation(e.target.value)}
+                    onChange={onChangeFormation}
                     input={<TextInput />}
                   >
                     <MenuItem value={'3-2-2-3'}>3-2-2-3</MenuItem>
@@ -212,7 +254,11 @@ const TeamManagement = () => {
                     <MenuItem value={'5-4-1'}>5-4-1</MenuItem>
                   </Select>
                 </div>
-                <div className={classes.teamConfig}></div>
+                <TeamFormation
+                  formation={formation}
+                  players={selectedPlayers}
+                  removePlayer={onRemovePlayer}
+                />
                 <GradientButton fullWidth onClick={onSaveTeam}>
                   Salvar
                 </GradientButton>
@@ -225,9 +271,18 @@ const TeamManagement = () => {
                   <TextInput id="player-search-input" />
                 </FormControl>
                 <section className={classes.playerList}>
-                  <PlayerCard />
-                  <PlayerCard />
-                  <PlayerCard />
+                  {availablePlayers.map(player => (
+                    <PlayerCard
+                      key={player.name}
+                      player={player}
+                      selectPlayer={onAddPlayer}
+                      disabled={
+                        selectedPlayers.findIndex(
+                          selected => selected.name === player.name,
+                        ) !== -1
+                      }
+                    />
+                  ))}
                 </section>
               </div>
             </section>

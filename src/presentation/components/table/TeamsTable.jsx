@@ -36,6 +36,7 @@ const TeamsTable = () => {
 
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
+
   const rows = useMemo(() => {
     let sortedRows = [...teams];
     if (orderBy !== null) {
