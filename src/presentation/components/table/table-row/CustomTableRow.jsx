@@ -1,18 +1,32 @@
+import {useDispatch} from 'react-redux';
+import {useHistory} from 'react-router-dom';
 import {IconButton, TableCell, TableRow} from '@material-ui/core';
 import {Delete, Edit, Share} from '@material-ui/icons';
 import {CustomTooltip} from '../../tooltip/CustomTooltip';
 import {useStyles} from '../teams-table.styles';
+import {deleteTeam, editTeam} from '../../../../redux/actions/teams';
 
-const CustomTableRow = ({row, index}) => {
+const CustomTableRow = ({row}) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  function onDeleteTeam() {
+    dispatch(deleteTeam(row.id));
+  }
+
+  function onEditTeam() {
+    dispatch(editTeam(row));
+    history.push('/team-management');
+  }
 
   return (
-    <TableRow hover key={index} className={classes.row}>
+    <TableRow hover className={classes.row}>
       <TableCell>{row.name}</TableCell>
       <TableCell>{row.description}</TableCell>
       <TableCell className={classes.actions}>
         <CustomTooltip title="Excluir">
-          <IconButton>
+          <IconButton onClick={onDeleteTeam}>
             <Delete />
           </IconButton>
         </CustomTooltip>
@@ -22,7 +36,7 @@ const CustomTableRow = ({row, index}) => {
           </IconButton>
         </CustomTooltip>
         <CustomTooltip title="Edit">
-          <IconButton>
+          <IconButton onClick={onEditTeam}>
             <Edit name="Edit" />
           </IconButton>
         </CustomTooltip>

@@ -1,4 +1,5 @@
 import {useMemo, useState} from 'react';
+import {useSelector} from 'react-redux';
 import {
   Table,
   TableBody,
@@ -28,36 +29,10 @@ const columns = [
   },
 ];
 
-const teams = [
-  {name: 'Barcelona', description: 'a'},
-  {name: 'Real Madrid', description: 'b'},
-  {name: 'Milan', description: 'c'},
-  {name: 'Liverpool', description: 'd'},
-  {name: 'Barcelona', description: 'e'},
-  {name: 'Barcelona', description: 'f'},
-  {name: 'Real Madrid', description: 'g'},
-  {name: 'Milan', description: 'h'},
-  {name: 'Liverpool', description: 'i'},
-  {name: 'Barcelona', description: 'j'},
-  {name: 'Barcelona', description: 'k'},
-  {
-    name: 'Real Madrid',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris lobortis est ac ipsum pellentesque, sed dictum velit posuere. Ut tempus libero nunc, tempus consectetur neque maximus sed.',
-  },
-  {name: 'Milan', description: 'm'},
-  {name: 'Liverpool', description: 'n'},
-  {name: 'Barcelona', description: 'o'},
-  {name: 'Barcelona', description: 'p'},
-  {name: 'Real Madrid', description: 'q'},
-  {name: 'Milan', description: 'r'},
-  {name: 'Liverpool', description: 's'},
-  {name: 'Barcelona', description: 't'},
-  {name: 'Barcelona', description: 'u'},
-];
-
 const TeamsTable = () => {
   const classes = useStyles();
+
+  const teams = useSelector(state => state.teams.teams);
 
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('name');
@@ -74,7 +49,7 @@ const TeamsTable = () => {
       });
     }
     return sortedRows;
-  }, [order, orderBy]);
+  }, [order, orderBy, teams]);
 
   function sortUpdate(e) {
     if (orderBy === e) {
@@ -112,7 +87,7 @@ const TeamsTable = () => {
         </TableHead>
         <TableBody>
           {rows.map((row, index) => (
-            <CustomTableRow row={row} index={index} />
+            <CustomTableRow key={index} row={row} />
           ))}
         </TableBody>
       </Table>

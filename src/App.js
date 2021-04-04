@@ -1,5 +1,8 @@
+import {Provider} from 'react-redux';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import {ThemeProvider} from '@material-ui/styles';
+
+import store from './redux/store';
 
 import Footer from './presentation/components/footer/footer';
 import Header from './presentation/components/header/header';
@@ -10,16 +13,18 @@ import {theme} from './presentation/styles/theme';
 
 function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <Header />
-        <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/team-management" component={TeamManagement} />
-        </Switch>
-        <Footer />
-      </ThemeProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <Header />
+          <Switch>
+            <Route path="/" exact component={Home} />
+            <Route path="/team-management" component={TeamManagement} />
+          </Switch>
+          <Footer />
+        </ThemeProvider>
+      </BrowserRouter>
+    </Provider>
   );
 }
 

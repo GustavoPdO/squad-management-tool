@@ -1,4 +1,6 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {useHistory} from 'react-router-dom';
 import validator from 'validator';
 import {
   Card,
@@ -17,21 +19,44 @@ import TextInput from '../../components/text-input/TextInput';
 import {useGlobalStyles} from '../../styles/global.styles';
 import {useStyles} from './team-management.styles';
 
+import {
+  addTeam,
+  resetActiveTeam,
+  updateTeam,
+} from '../../../redux/actions/teams';
+
 const TeamManagement = () => {
   const classes = useStyles();
   const globalClasses = useGlobalStyles();
 
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const dispatch = useDispatch();
+  const history = useHistory();
+  //When there's an active team on state the application gets it and fill the component state
+  const editingTeam = useSelector(state => state.teams.activeTeam);
+
+  const [name, setName] = useState(editingTeam ? editingTeam.name : '');
+  const [description, setDescription] = useState(
+    editingTeam ? editingTeam.description : '',
+  );
   const [tag, setTag] = useState('');
-  const [tagArray, setTagArray] = useState([]);
-  const [website, setWebsite] = useState('');
-  const [type, setType] = useState('fantasy');
-  const [formation, setFormation] = useState('3-4-3');
+  const [tagArray, setTagArray] = useState(
+    editingTeam ? editingTeam.tagArray : [],
+  );
+  const [website, setWebsite] = useState(
+    editingTeam ? editingTeam.website : '',
+  );
+  const [type, setType] = useState(editingTeam ? editingTeam.type : 'fantasy');
+  const [formation, setFormation] = useState(
+    editingTeam ? editingTeam.formation : '3-4-3',
+  );
   const [showError, setShowError] = useState(false);
 
   function validateWebSite() {
     return validator.isURL(website) ? false : true;
+  }
+
+  function validateName() {
+    return name === '';
   }
 
   function onChangeTag(value) {
@@ -53,6 +78,34 @@ const TeamManagement = () => {
     setTagArray(tagArray.filter(item => item !== value));
   }
 
+  function onSaveTeam() {
+    //after clicking save button the form error will trigger if necessary
+    setShowError(true);
+    if (validateName() || validateWebSite()) return;
+
+    const team = {
+      name,
+      description,
+      tagArray,
+      website,
+      type,
+      formation,
+    };
+
+    if (editingTeam) {
+      team.id = editingTeam.id;
+      dispatch(updateTeam(team));
+    } else {
+      dispatch(addTeam(team));
+    }
+    history.push('/');
+  }
+
+  useEffect(() => {
+    //When this component is unmounted the active team will be resetted
+    return () => dispatch(resetActiveTeam());
+  }, [dispatch]);
+
   return (
     <main className={classes.container}>
       <Card component="article" elevation={0} className={classes.card}>
@@ -64,7 +117,7 @@ const TeamManagement = () => {
             <h2>TEAM INFORMATION</h2>
             <section className={classes.inputSection}>
               <div className={classes.inputSubDivision}>
-                <FormControl required error={showError && name === ''}>
+                <FormControl required error={showError && validateName()}>
                   <FormLabel htmlFor="team-name-input">Team name</FormLabel>
                   <TextInput
                     id="team-name-input"
@@ -160,7 +213,9 @@ const TeamManagement = () => {
                   </Select>
                 </div>
                 <div className={classes.teamConfig}></div>
-                <GradientButton fullWidth>Salvar</GradientButton>
+                <GradientButton fullWidth onClick={onSaveTeam}>
+                  Salvar
+                </GradientButton>
               </div>
               <div className={classes.inputSubDivision}>
                 <FormControl>
