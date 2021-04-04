@@ -5,7 +5,7 @@ import {useStyles} from './gradient-button.styles';
 const GradientButton = ({fullWidth = false, ...props}) => {
   const classes = useStyles({...props, fullWidth});
   return (
-    <Button variant="contained" className={classes.button}>
+    <Button variant="contained" className={classes.button} {...props}>
       {props.children}
     </Button>
   );

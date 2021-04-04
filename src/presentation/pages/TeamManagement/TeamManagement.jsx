@@ -1,23 +1,57 @@
+import {useState} from 'react';
+import validator from 'validator';
 import {
   Card,
-  Checkbox,
   FormControl,
   FormControlLabel,
-  FormGroup,
   FormLabel,
   MenuItem,
+  Radio,
+  RadioGroup,
   Select,
 } from '@material-ui/core';
-import {FiberManualRecord, FiberManualRecordOutlined} from '@material-ui/icons';
 import GradientButton from '../../components/gradient-button/GradientButton';
-import {PlayerCard} from '../../components/player-card/PlayerCard';
-import TextInput from '../../components/TextInput/TextInput';
+import PlayerCard from '../../components/player-card/PlayerCard';
+import Tag from '../../components/tag/Tag';
+import TextInput from '../../components/text-input/TextInput';
 import {useGlobalStyles} from '../../styles/global.styles';
 import {useStyles} from './team-management.styles';
 
 const TeamManagement = () => {
   const classes = useStyles();
   const globalClasses = useGlobalStyles();
+
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [tag, setTag] = useState('');
+  const [tagArray, setTagArray] = useState([]);
+  const [website, setWebsite] = useState('');
+  const [type, setType] = useState('fantasy');
+  const [formation, setFormation] = useState('3-4-3');
+  const [showError, setShowError] = useState(false);
+
+  function validateWebSite() {
+    return validator.isURL(website) ? false : true;
+  }
+
+  function onChangeTag(value) {
+    if (value[value.length - 1] === ';') return;
+    setTag(value);
+  }
+
+  function onAddTag(event) {
+    if (
+      (event.keyCode === 13 || event.keyCode === 191) &&
+      !tagArray.some(item => item === tag)
+    ) {
+      setTagArray([...tagArray, tag]);
+      setTag('');
+    }
+  }
+
+  function removeTag(value) {
+    setTagArray(tagArray.filter(item => item !== value));
+  }
 
   return (
     <main className={classes.container}>
@@ -30,57 +64,74 @@ const TeamManagement = () => {
             <h2>TEAM INFORMATION</h2>
             <section className={classes.inputSection}>
               <div className={classes.inputSubDivision}>
-                <FormControl>
+                <FormControl required error={showError && name === ''}>
                   <FormLabel htmlFor="team-name-input">Team name</FormLabel>
                   <TextInput
-                    defaultValue="Insert team name"
                     id="team-name-input"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
                   />
                 </FormControl>
                 <FormControl>
                   <FormLabel htmlFor="description-input">Description</FormLabel>
-                  <TextInput multiline rows={10} id="description-input" />
+                  <TextInput
+                    multiline
+                    rows={10}
+                    id="description-input"
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                  />
                 </FormControl>
               </div>
               <div className={classes.inputSubDivision}>
-                <FormControl>
+                <FormControl required error={showError && validateWebSite()}>
                   <FormLabel htmlFor="team-website-input">
                     Team website
                   </FormLabel>
                   <TextInput
-                    defaultValue="http://myteam.com"
                     id="team-website-input"
+                    value={website}
+                    onChange={e => setWebsite(e.target.value)}
                   />
                 </FormControl>
-                <FormControl>
+                <FormControl required>
                   <FormLabel>Team type</FormLabel>
-                  <FormGroup row>
+                  <RadioGroup
+                    row
+                    name="team type"
+                    value={type}
+                    onChange={e => setType(e.target.value)}
+                  >
                     <FormControlLabel
-                      control={
-                        <Checkbox
-                          icon={<FiberManualRecordOutlined />}
-                          checkedIcon={<FiberManualRecord />}
-                          name="type"
-                        />
-                      }
+                      control={<Radio />}
                       label="Real"
+                      value="real"
                     />
                     <FormControlLabel
-                      control={
-                        <Checkbox
-                          icon={<FiberManualRecordOutlined />}
-                          checkedIcon={<FiberManualRecord />}
-                          name="type"
-                        />
-                      }
+                      control={<Radio />}
                       label="Fantasy"
+                      value="fantasy"
                     />
-                  </FormGroup>
+                  </RadioGroup>
                 </FormControl>
                 <FormControl>
                   <FormLabel htmlFor="tags-input">Tags</FormLabel>
-                  <TextInput multiline rows={6} id="tags-input" />
+                  <TextInput
+                    id="tags-input"
+                    value={tag}
+                    onChange={e => onChangeTag(e.target.value)}
+                    onKeyDown={e => onAddTag(e)}
+                  />
                 </FormControl>
+                <section className={classes.tagContainer}>
+                  {tagArray.map(item => (
+                    <Tag
+                      key={item}
+                      name={item}
+                      onClick={() => removeTag(item)}
+                    />
+                  ))}
+                </section>
               </div>
             </section>
           </section>
@@ -89,8 +140,13 @@ const TeamManagement = () => {
             <section className={classes.inputSection}>
               <div className={classes.inputSubDivision}>
                 <div className={classes.formationSelectionContainer}>
-                  <p>Formation</p>
-                  <Select value={'3-4-3'} input={<TextInput />}>
+                  <p>Formation *</p>
+                  <Select
+                    className={classes.select}
+                    value={formation}
+                    onChange={e => setFormation(e.target.value)}
+                    input={<TextInput />}
+                  >
                     <MenuItem value={'3-2-2-3'}>3-2-2-3</MenuItem>
                     <MenuItem value={'3-2-3-1'}>3-2-3-1</MenuItem>
                     <MenuItem value={'3-4-3'}>3-4-3</MenuItem>
@@ -111,10 +167,7 @@ const TeamManagement = () => {
                   <FormLabel htmlFor="player-search-input">
                     Search Players
                   </FormLabel>
-                  <TextInput
-                    defaultValue="http://myteam.com"
-                    id="player-search-input"
-                  />
+                  <TextInput id="player-search-input" />
                 </FormControl>
                 <section className={classes.playerList}>
                   <PlayerCard />

@@ -1,7 +1,7 @@
 import {Card} from '@material-ui/core';
 import {useStyles} from './player-card.styles';
 
-export const PlayerCard = () => {
+const PlayerCard = () => {
   const classes = useStyles();
 
   return (
@@ -20,3 +20,5 @@ export const PlayerCard = () => {
     </Card>
   );
 };
+
+export default PlayerCard;

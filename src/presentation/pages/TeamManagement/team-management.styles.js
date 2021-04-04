@@ -44,6 +44,10 @@ export const useStyles = makeStyles(theme => ({
     width: '100%',
     maxWidth: '500px',
   },
+  tagContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
   formationSelectionContainer: {
     display: 'flex',
     alignItems: 'center',
@@ -55,9 +59,9 @@ export const useStyles = makeStyles(theme => ({
       lineHeight: 1,
       letterSpacing: '0.00938em',
     },
-    '& select': {
-      width: '100%',
-    },
+  },
+  select: {
+    width: '150px',
   },
   teamConfig: {
     background: theme.palette.gradient.vertical,
