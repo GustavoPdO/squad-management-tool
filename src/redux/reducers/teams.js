@@ -65,6 +65,7 @@ export default function TeamsReducer(state = initialState, action) {
 
       let pickingCount = players.reduce(
         (id, player) => (
+          // eslint-disable-next-line
           (id[player.player_id] = (id[player.player_id] || 0) + 1), id
         ),
         {},
