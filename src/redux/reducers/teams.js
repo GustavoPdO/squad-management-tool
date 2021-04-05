@@ -50,6 +50,13 @@ export default function TeamsReducer(state = initialState, action) {
         activeTeam: undefined,
       };
     case CALCULATE_TOP_FIVE:
+      if (state.teams.length === 0)
+        return {
+          ...state,
+          highestAvgAgeList: [],
+          lowestAvgAgeList: [],
+        };
+
       const list = getTeamAvgAges(state.teams);
       return {
         ...state,
@@ -61,12 +68,19 @@ export default function TeamsReducer(state = initialState, action) {
           .sort((a, b) => (a.avgAge > b.avgAge ? 1 : -1)),
       };
     case GET_MOST_LESS_PICKED:
+      if (state.teams.length === 0) {
+        return {
+          ...state,
+          lessPickedPlayer: undefined,
+          mostPickedPlayer: undefined,
+        };
+      }
       let players = state.teams.map(team => team.selectedPlayers).flat(1);
 
       let pickingCount = players.reduce(
         (id, player) => (
           // eslint-disable-next-line
-          (id[player.player_id] = (id[player.player_id] || 0) + 1), id
+            (id[player.player_id] = (id[player.player_id] || 0) + 1), id
         ),
         {},
       );
@@ -92,6 +106,7 @@ export default function TeamsReducer(state = initialState, action) {
         lessPickedPlayer: lessPicked,
         mostPickedPlayer: mostPicked,
       };
+
     default:
       return state;
   }

@@ -66,4 +66,14 @@ export const useStyles = makeStyles(theme => ({
       borderBottom: '1px solid white',
     },
   },
+  noTeamContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+  },
+  noTeamMessage: {
+    fontSize: '1.4rem',
+  },
 }));

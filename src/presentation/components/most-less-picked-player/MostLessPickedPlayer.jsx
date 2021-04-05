@@ -28,36 +28,46 @@ const MostLessPickedPlayer = () => {
 
   return (
     <Card component="section" elevation={0} className={classes.container}>
-      <section className={classes.playerContainer}>
-        <header className={classes.header}>
-          <h1>Most picked player</h1>
-        </header>
-        <div className={classes.playerContent}>
-          <div className={classes.playerInitials}>
-            <CustomTooltip title={mostPickedPlayer.display_name}>
-              <p>{showInitials(mostPickedPlayer.display_name)}</p>
-            </CustomTooltip>
-          </div>
-          <div className={classes.percentageContainer}>
-            <p>{mostPickedPlayer.pickingRatio.toFixed(2)}%</p>
-          </div>
-        </div>
-      </section>
-      <section className={classes.playerContainer}>
-        <header className={classes.header}>
-          <h1>Less picked player</h1>
-        </header>
-        <div className={classes.playerContent}>
-          <div className={classes.playerInitials}>
-            <CustomTooltip title={lessPickedPlayer.display_name}>
-              <p>{showInitials(lessPickedPlayer.display_name)}</p>
-            </CustomTooltip>
-          </div>
-          <div className={classes.percentageContainer}>
-            <p>{lessPickedPlayer.pickingRatio.toFixed(2)}%</p>
-          </div>
-        </div>
-      </section>
+      {mostPickedPlayer && lessPickedPlayer ? (
+        <>
+          <section className={classes.playerContainer}>
+            <header className={classes.header}>
+              <h1>Most picked player</h1>
+            </header>
+            <div className={classes.playerContent}>
+              <div className={classes.playerInitials}>
+                <CustomTooltip title={mostPickedPlayer.display_name}>
+                  <p>{showInitials(mostPickedPlayer.display_name)}</p>
+                </CustomTooltip>
+              </div>
+              <div className={classes.percentageContainer}>
+                <p>{mostPickedPlayer.pickingRatio.toFixed(2)}%</p>
+              </div>
+            </div>
+          </section>
+          <section className={classes.playerContainer}>
+            <header className={classes.header}>
+              <h1>Less picked player</h1>
+            </header>
+            <div className={classes.playerContent}>
+              <div className={classes.playerInitials}>
+                <CustomTooltip title={lessPickedPlayer.display_name}>
+                  <p>{showInitials(lessPickedPlayer.display_name)}</p>
+                </CustomTooltip>
+              </div>
+              <div className={classes.percentageContainer}>
+                <p>{lessPickedPlayer.pickingRatio.toFixed(2)}%</p>
+              </div>
+            </div>
+          </section>
+        </>
+      ) : (
+        <section className={classes.noTeamContainer}>
+          <p className={classes.noTeamMessage}>
+            Comece a adicionar times para ter estatísticas!
+          </p>
+        </section>
+      )}
     </Card>
   );
 };

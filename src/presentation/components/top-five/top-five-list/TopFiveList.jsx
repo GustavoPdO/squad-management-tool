@@ -19,7 +19,7 @@ const TopFiveList = ({header, list, ...props}) => {
               key={item.name}
             >
               <p>{item.name}</p>
-              <p className={classes.value}>{item.avgAge}</p>
+              <p className={classes.value}>{item.avgAge.toFixed(1)}</p>
             </Card>
           ))}
         </ol>
