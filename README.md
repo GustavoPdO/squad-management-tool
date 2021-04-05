@@ -38,3 +38,5 @@ Para verificar se as regras de lint na aplicação estão sendo aplicadas corret
 ### `yarn build`
 
 Builda a aplicação para produção no folder `build`
+
+Uma versão em produção está disponível em (https://squad-management-tool-green.vercel.app/)
