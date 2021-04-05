@@ -4,11 +4,13 @@ const cardHeight = 44;
 const cardMargin = 8;
 
 export const useStyles = makeStyles(theme => ({
-  container: {
+  container: props => ({
     backgroundColor: theme.palette.background.main,
     borderRadius: '12px',
-    height: `${cardHeight * 5 + cardMargin * 6}px`,
-  },
+    height: `${
+      cardHeight * props.list.length + cardMargin * (props.list.length + 1)
+    }px`,
+  }),
   header: {
     height: '40px',
   },

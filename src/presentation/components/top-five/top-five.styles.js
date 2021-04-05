@@ -4,7 +4,6 @@ const padding = 20;
 
 export const useStyles = makeStyles(theme => ({
   container: {
-    minHeight: '412px',
     width: '100%',
     display: 'flex',
     flexDirection: 'column',

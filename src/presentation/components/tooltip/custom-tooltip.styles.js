@@ -6,5 +6,6 @@ export const useStyles = makeStyles(theme => ({
   },
   tooltip: {
     backgroundColor: 'black',
+    fontSize: '0.8rem',
   },
 }));

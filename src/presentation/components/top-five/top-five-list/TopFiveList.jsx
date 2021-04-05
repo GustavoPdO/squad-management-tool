@@ -1,16 +1,9 @@
 import {Card} from '@material-ui/core';
 import {useStyles} from './top-five-list.styles';
 
-const info = [
-  {label: 'Inter Milan', value: 31.9},
-  {label: 'APOEL Nicosia', value: 31.7},
-  {label: 'AC Milan', value: 31.6},
-  {label: 'Besiktas JK', value: 31.4},
-  {label: 'Olympiacos Piraeus', value: 31.3},
-];
+const TopFiveList = ({header, list, ...props}) => {
+  const classes = useStyles({list, ...props});
 
-const TopFiveList = ({header}) => {
-  const classes = useStyles();
   return (
     <>
       <header className={classes.header}>
@@ -18,15 +11,15 @@ const TopFiveList = ({header}) => {
       </header>
       <section className={classes.container}>
         <ol>
-          {info.map(item => (
+          {list.map(item => (
             <Card
               component="li"
               elevation={0}
               className={classes.listItem}
-              key={item.label}
+              key={item.name}
             >
-              <p>{item.label}</p>
-              <p className={classes.value}>{item.value}</p>
+              <p>{item.name}</p>
+              <p className={classes.value}>{item.avgAge}</p>
             </Card>
           ))}
         </ol>

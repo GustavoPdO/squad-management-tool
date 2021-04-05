@@ -1,8 +1,31 @@
+import {useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {Card} from '@material-ui/core';
 import {useStyles} from './most-less-picked-player.styles';
+import {CustomTooltip} from '../tooltip/CustomTooltip';
+import {getMostLessPickedPlayer} from '../../../redux/actions/teams';
 
 const MostLessPickedPlayer = () => {
   const classes = useStyles();
+
+  const dispatch = useDispatch();
+  const mostPickedPlayer = useSelector(state => state.teams.mostPickedPlayer);
+  const lessPickedPlayer = useSelector(state => state.teams.lessPickedPlayer);
+
+  function showInitials(name) {
+    let names = name.split(' ');
+    let initials = names[0].slice(0, 1).toUpperCase();
+
+    if (names.length > 1) {
+      initials += names[names.length - 1].slice(0, 1).toUpperCase();
+    }
+    return initials;
+  }
+
+  useEffect(() => {
+    dispatch(getMostLessPickedPlayer());
+  }, [dispatch]);
+
   return (
     <Card component="section" elevation={0} className={classes.container}>
       <section className={classes.playerContainer}>
@@ -11,10 +34,12 @@ const MostLessPickedPlayer = () => {
         </header>
         <div className={classes.playerContent}>
           <div className={classes.playerInitials}>
-            <p>GP</p>
+            <CustomTooltip title={mostPickedPlayer.display_name}>
+              <p>{showInitials(mostPickedPlayer.display_name)}</p>
+            </CustomTooltip>
           </div>
           <div className={classes.percentageContainer}>
-            <p>75%</p>
+            <p>{mostPickedPlayer.pickingRatio.toFixed(2)}%</p>
           </div>
         </div>
       </section>
@@ -24,10 +49,12 @@ const MostLessPickedPlayer = () => {
         </header>
         <div className={classes.playerContent}>
           <div className={classes.playerInitials}>
-            <p>GP</p>
+            <CustomTooltip title={lessPickedPlayer.display_name}>
+              <p>{showInitials(lessPickedPlayer.display_name)}</p>
+            </CustomTooltip>
           </div>
           <div className={classes.percentageContainer}>
-            <p>25%</p>
+            <p>{lessPickedPlayer.pickingRatio.toFixed(2)}%</p>
           </div>
         </div>
       </section>
